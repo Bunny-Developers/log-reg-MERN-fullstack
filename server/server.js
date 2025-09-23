@@ -1,17 +1,34 @@
- const express = require("express")
- const mongoose = require("mongoose")
- const cors = require("cors")
- const LearnerModel = require("./models/User")
+ const express = require("express");
+ const mongoose = require("mongoose");
+ const cors = require("cors");
+ require('dotenv').config();
 
- const app = express()
- app.use(express.json())
- app.use(cors())
+ const authRoutes = require('./routes/auth');
 
- mongoose.connect("mongodb//127.0.0.1.27017/user")
- app.post('/register', (req, res) => {
-  UserModel.create(req.body).then(users => res.json(users)).catch(err => res.json(err))
+//const LearnerModel = require("./models/User")
+
+ const app = express();
+ 
+ //middleware
+ app.use(express.json());
+ app.use(cors());
+
+ //Routes
+ app.use('./api/auth', authRoutes);
+
+ //Database connection
+ mongoose.connect(process.env.MONGODB_URI || "mongodb//127.0.0.1.27017/mern_auth", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
  })
-app.listen(3000, () => {
-  console.console.log("Server started at 3000");
-  
-})
+ .then(() => console.log('MongoDB connected successfully'))
+ .catch(err () => console.log(err));
+ 
+ const PORT = process.env.PORT || 5000;
+
+ app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+ });
+// app.post('/register', (req, res) => {
+  //UserModel.create(req.body).then(users => res.json(users)).catch(err => res.json(err))
+// })
